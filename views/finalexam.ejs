@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeFusion Final Exam</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #007bff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 3px;
+      transition: background-color 0.3s ease;
+    }
+    .navbar a:hover {
+      background-color: #0056b3;
+    }
+    .navbar .logo {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .navbar .nav-links {
+      display: flex;
+      gap: 15px;
+    }
+    h3 {
+      color: blue;
+      text-align: center;
+    }
+    p {
+      cursor: pointer;
+      color: green;
+      text-align: center;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      margin-top: 120px;
+      margin-bottom: 80px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      width: 100%;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+    .hidden {
+      display: none;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 10px 0;
+      background-color: #f1f1f1;
+      border-top: 1px solid #ccc;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">CodeFusion</div>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+
+  <form id="signupForm" onsubmit="handleFormSubmit(event)">
+    <h3>If you are already a user in the CMS, you do not need to sign up again. Simply sign in to continue.</h3>
+    
+    <label for="email">Your Email:</label>
+    <input type="email" id="email" name="email" placeholder="Enter your email">
+    <p id="emailError" class="error hidden"></p>
+
+    <label for="fullName">Full Name:</label>
+    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name">
+    <p id="nameError" class="error hidden"></p>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" placeholder="Enter your password">
+    <p id="passwordError" class="error hidden"></p>
+
+    <label for="confirmPassword">Confirm Password:</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
+    <p id="confirmError" class="error hidden"></p>
+
+    <label for="signupAs">Sign Up As:</label>
+    <select id="signupAs" name="signupAs">
+      <option value="">Select an option</option>
+      <option value="admission">Admission Applicant</option>
+      <option value="faculty">Apply for Job</option>
+      <option value="vendor">Vendor Basic Group</option>
+    </select>
+    <p id="signupAsError" class="error hidden"></p>
+
+    <button type="submit">Submit</button>
+    <p>Already have an account? <a href="/signin">Sign in here</a></p>
+  </form>
+
+  <footer>
+    &copy; 2024 AbdulSattar Majid. All rights reserved.
+  </footer>
+
+<script>
+  async function handleFormSubmit(event) {
+    event.preventDefault(); 
+
+    const isValid = await validateForm();
+    if (!isValid) {
+      return;
+    }; 
+
+    const formData = {
+      email: document.getElementById('email').value.trim(),
+      fullName: document.getElementById('fullName').value.trim(),
+      password: document.getElementById('password').value.trim(),
+      signupAs: document.getElementById('signupAs').value.trim()
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('Sign-up successful!');
+        window.location.href='http://localhost:3000/signup-success'
+      } else {
+        const errorResult = await response.json();
+        if (response.status === 400 && errorResult.message === 'Email is already in use.') {
+          alert('Failed: The email is already in use.');
+        } else {
+          alert('There was an error submitting the form.');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('There was an error submitting the form.');
+    }
+  }
+
+  async function validateForm() {
+    let isValid = true;
+
+    document.querySelectorAll('.error').forEach(function(errorElement) {
+      errorElement.classList.add('hidden');
+    });
+
+    const email = document.getElementById('email').value.trim();
+    const name = document.getElementById('fullName').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+    const signupAs = document.getElementById('signupAs').value.trim();
+
+    if (email === '') {
+      document.getElementById('emailError').textContent = "Please fill in your email.";
+      document.getElementById('emailError').classList.remove('hidden');
+      isValid = false;
+    }
+
+    if (name === '') {
+      document.getElementById('nameError').textContent = "Please fill in your full name.";
+      document.getElementById('nameError').classList.remove('hidden');
+      isValid = false;
+    }
+
+    if (password === '') {
+      document.getElementById('passwordError').textContent = "Please fill in your password.";
+      document.getElementById('passwordError').classList.remove('hidden');
+      isValid = false;
+    } else if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[!@#$%^&*]/.test(password)) {
+      document.getElementById('passwordError').textContent = "Password must be at least 8 characters long, with a mix of uppercase, lowercase, numbers, and special characters.";
+      document.getElementById('passwordError').classList.remove('hidden');
+      isValid = false;
+    }
+
+    if (confirmPassword === '') {
+      document.getElementById('confirmError').textContent = "Please confirm your password.";
+      document.getElementById('confirmError').classList.remove('hidden');
+      isValid = false;
+    } else if (password !== confirmPassword) {
+      document.getElementById('confirmError').textContent = "Passwords do not match.";
+      document.getElementById('confirmError').classList.remove('hidden');
+      isValid = false;
+    }
+
+    if (signupAs === '') {
+      document.getElementById('signupAsError').textContent = "Please select an option.";
+      document.getElementById('signupAsError').classList.remove('hidden');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+</script>
+</body>
+</html>

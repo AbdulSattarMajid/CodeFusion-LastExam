@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #007bff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      color: white;
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 3px;
+      transition: background-color 0.3s ease;
+    }
+    .navbar a:hover {
+      background-color: #0056b3;
+    }
+    .navbar .logo {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .navbar .nav-links {
+      display: flex;
+      gap: 15px;
+    }
+    form {
+      max-width: 400px;
+      margin: 60px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h3 {
+      color: blue;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+    .hidden {
+      display: none;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 10px 0;
+      background-color: #f1f1f1;
+      border-top: 1px solid #ccc;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style></head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">CodeFusion</div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/signin">Sign In</a>
+      <a href="/signup">Sign Up</a>
+    </div>
+  </div>
+
+  <form id="signinForm" onsubmit="handleSignInSubmit(event)">
+    <h3>Sign In</h3>
+    
+    <label for="signinEmail">Your Email:</label>
+    <input type="email" id="signinEmail" name="email" placeholder="Enter your email">
+    <p id="signinEmailError" class="error hidden"></p>
+
+    <label for="signinPassword">Password:</label>
+    <input type="password" id="signinPassword" name="password" placeholder="Enter your password">
+    <p id="signinPasswordError" class="error hidden"></p>
+
+    <button type="submit">Sign In</button>
+    <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+  </form>
+
+  <footer>
+    &copy; 2024 AbdulSattar Majid. All rights reserved.
+  </footer>
+
+<script>
+  async function handleSignInSubmit(event) {
+    event.preventDefault(); 
+
+    const email = document.getElementById('signinEmail').value.trim();
+    const password = document.getElementById('signinPassword').value.trim();
+
+    if (email === '' || password === '') {
+      document.getElementById('signinEmailError').textContent = email === '' ? "Email is required." : '';
+      document.getElementById('signinPasswordError').textContent = password === '' ? "Password is required." : '';
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        window.location.href = '/signin-success';
+      } else {
+        const errorResult = await response.json();
+        alert('Sign-in failed: ' + errorResult.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('There was an error submitting the form.');
+    }
+  }
+</script>
+</body>
+</html>
